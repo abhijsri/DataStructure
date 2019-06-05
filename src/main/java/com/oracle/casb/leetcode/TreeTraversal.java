@@ -231,6 +231,33 @@ public class TreeTraversal {
             }
         }
     }
+    public  int dynamic(int[] v, int amount) {
+        int[][] dynamic = new int[v.length+1][amount+1];
+        dynamic[0][0] = 0;
+        //if no coins given, 0 ways to change the amount
+        //if amount=0 then just return empty set to make the change
+        for (int coinIndex = 0; coinIndex <= v.length; coinIndex++) {
+            dynamic[coinIndex][0] = 1;
+        }
+        for (int coinIndex = 1; coinIndex <= v.length; coinIndex++) {
+            for (int amnt = 1; amnt <= amount; amnt++) {
+                // check if the coin value is less than the amount needed
+               if(v[coinIndex-1] <= amnt) {
+                   // reduce the amount by coin value and
+                   // use the subproblem solution (amount-v[i]) and
+                   // add the solution from the top to it
+                   dynamic[coinIndex][amnt]
+                           = dynamic[coinIndex - 1][amnt]
+                           + dynamic[coinIndex][amnt - v[coinIndex-1]];
+
+               } else {
+                    dynamic[coinIndex][amnt] = dynamic[coinIndex-1][amnt];
+               }
+            }
+        }
+        return dynamic[v.length][amount];
+    }
+
     private List<Integer> zigzagTraversal(TreeNode<Integer> root) {
         List<Integer> list = new ArrayList<>();
         LinkedList<TreeNode> queue = new LinkedList<>();
@@ -242,24 +269,24 @@ public class TreeTraversal {
             list.add(node.getValue());
             if (isEven) {
                 if(node.getLeft() != null) {
-                    child.offer(node.getLeft());
+                    child.add(0, node.getLeft());
                 }
                 if (node.getRight() != null) {
-                    child.offer(node.getRight());
+                    child.add(0, node.getRight());
                 }
             } else {
                 if (node.getRight() != null) {
-                    child.offer(node.getRight());
+                    child.add(0, node.getRight());
                 }
                 if(node.getLeft() != null) {
-                    child.offer(node.getLeft());
+                    child.add(0, node.getLeft());
                 }
             }
-            isEven = !isEven;
             if (queue.isEmpty()) {
-                Collections.reverse(child);
+                //Collections.reverse(child);
                 queue.addAll(child);
                 child.clear();
+                isEven = !isEven;
             }
         }
         return list;

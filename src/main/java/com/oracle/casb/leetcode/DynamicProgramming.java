@@ -1,5 +1,8 @@
 package com.oracle.casb.leetcode;
 
+import com.google.common.collect.ImmutableMap;
+import com.oracle.casb.common.ListNode;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -49,11 +52,11 @@ public class DynamicProgramming {
     public static void main(String[] args) {
         DynamicProgramming dp = new DynamicProgramming();
         //dp.testMaxProfit();
-        //dp.testLongestValidParanthesis();
+        dp.testLongestValidParanthesis();
         //dp.testMinWindow();
         //dp.testMinLexicoGraphic();
         //dp.testMaxAreainHistogram();
-        dp.testPrimeNumbers();
+        //dp.testPrimeNumbers();
     }
 
     private void testPrimeNumbers() {
@@ -130,8 +133,11 @@ public class DynamicProgramming {
         //int len = longestValidParentheses1(")()())");
         String str = "((())()";
         int max1 = maxValidParanLen(str);
+        System.out.println("Max len is  - " + max1);
         int len1 = longestValidParenthesesDP(str);
+        System.out.println("Max len is  - " + len1);
         int len = longestParanthesesValid(str);
+        System.out.println("Max len is  - " + len);
         int max = maxValidLenParntheses(str);
         System.out.println("Max len is  - " + max);
     }
@@ -277,7 +283,7 @@ public class DynamicProgramming {
         }
         int maxStart = 0;
         int maxEnd = 0;
-        int maxWindowSize = Integer.MAX_VALUE;
+        int minWindowSize = Integer.MAX_VALUE;
         int count = 0;
         for(int begin = 0, end = 0; end < source.length(); end++) {
             if (needToFound[source.charAt(end)] == 0) {
@@ -300,8 +306,8 @@ public class DynamicProgramming {
                     begin += 1;
                 }
                 int currWindowLen = end -begin + 1;
-                if (currWindowLen < maxWindowSize) {
-                    maxWindowSize = currWindowLen;
+                if (currWindowLen < minWindowSize) {
+                    minWindowSize = currWindowLen;
                     maxStart = begin;
                     maxEnd = end;
                 }
@@ -341,6 +347,54 @@ public class DynamicProgramming {
             }
         }
         return maxLen;
+    }
+
+    private boolean isValidPrantheses(String str) {
+        Map<Character, Character> map = ImmutableMap.of('(', ')', '{', '}', '[', ']');
+        char[] array = str.toCharArray();
+        Stack<Character> stack = new Stack<>();
+        for (int i = 0; i < array.length; i++) {
+            char ch = array[i];
+            if (ch == '(' || ch == '{' || ch == '[') {
+                stack.push(map.get(ch));
+            } else {
+                if(stack.isEmpty() || stack.pop() != ch) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private ListNode mergeKList(ListNode [] heads) {
+        ListNode head = null;
+        ListNode current = head;
+        int smallest = -1;
+        while ((smallest = getsmallest(heads)) != -1) {
+            if(head == null) {
+                head = heads[smallest];
+                current = head;
+            } else {
+                current.setNext(heads[smallest]);
+                current = current.getNext();
+            }
+            heads[smallest] = heads[smallest].getNext();
+        }
+        current.setNext(null);
+        return head;
+    }
+
+    private int getsmallest(ListNode[] heads) {
+        int smallest = -1;
+        for (int i = 0; i < heads.length; i++) {
+            if (heads[i] == null) {
+                continue;
+            }
+            if (smallest == -1 || heads[smallest].getValue() > heads[i].getValue()) {
+                smallest = i;
+            }
+        }
+        return smallest;
     }
 
     private int maxValidParanLen(String str) {
