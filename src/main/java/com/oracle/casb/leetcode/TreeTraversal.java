@@ -4,8 +4,10 @@ import com.oracle.casb.common.TreeNode;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.stream.Collectors;
@@ -290,5 +292,51 @@ public class TreeTraversal {
             }
         }
         return list;
+    }
+    
+    private List<Integer> printBoundryBinaryTree(TreeNode<Integer> root) {
+        List<Integer> res = new ArrayList<>();
+        if (root == null) {
+            return res;
+        }
+        res.add(root.getValue());
+        Map<Integer, Integer> map = new HashMap<>();
+        int level = 2;
+        Queue<TreeNode<Integer>> main = new LinkedList<>();
+        Queue<TreeNode<Integer>> secondary = new LinkedList<>();
+        List<Integer> bottomLevel = new ArrayList<>();
+        main.add(root);
+        TreeNode<Integer> first = null;
+        while (!main.isEmpty()) {
+            TreeNode<Integer> current = main.poll();
+            if (isLeaf(current)) {
+                bottomLevel.add(current.getValue());
+                continue;
+            }
+            if (first == null && current != root) {
+                res.add(current.getValue());
+                first = current;
+            }
+            secondary.add(current.getLeft());
+            secondary.add(current.getRight());
+            if (main.isEmpty()) {
+                first = null;
+                if (current != root) {
+                    map.put(level, current.getValue());
+                }
+                level += 1;
+                main = secondary;
+                secondary.clear();
+            }
+        }
+        res.addAll(bottomLevel);
+        for (int i = level - 1; i > 1; i--) {
+            res.add(map.get(i));
+        }
+        return res;
+    }
+
+    private boolean isLeaf(TreeNode<Integer> node) {
+        return !(node.getLeft() == null || node.getRight() == null);
     }
 }
